@@ -1,0 +1,8 @@
+gmail:
+  host: "smtp.gmail.com"
+  username: "djuang.1@riqcrm.com"
+  apppassword: ""
+  
+email:
+  from: "djuang.1@riqcrm.com"
+  to: "dejim.juang@mulesoft.com"

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="29d1c081-69a2-4dfb-9215-60df78c7b9b0" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="ff18c395-e25f-4449-b6f7-a2c1f719099f" >
+		<email:smtps-connection host="${gmail.host}" user="${gmail.username}" password="${gmail.apppassword}" >
+			<tls:context >
+				<tls:trust-store insecure="true" />
+			</tls:context>
+		</email:smtps-connection>
+	</email:smtp-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="542d0f79-2c08-410a-a77a-027c8918fdc5" file="properties.yaml" />
+	<flow name="smtp-gmail-example-mule4Flow" doc:id="aaedc99e-9886-4f08-be9c-e9a99d28617a" >
+		<http:listener doc:name="Listener" doc:id="565a5d5c-57ff-4931-aa5d-71b205d4d21a" config-ref="HTTP_Listener_config" path="/send"/>
+		<ee:transform doc:name="Transform Message" doc:id="735a66b1-7316-496e-b3b4-62db917efc25" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"Hello World!"]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<email:send doc:name="Send" doc:id="050e58ea-9775-4f54-871e-a470341d821c" config-ref="Email_SMTP" fromAddress="${email.from}" subject="[No Subject] - App Passwords">
+			<email:to-addresses >
+				<email:to-address value="${email.to}" />
+			</email:to-addresses>
+			<email:body contentType="text/plain" />
+		</email:send>
+		<ee:transform doc:name="Transform Message" doc:id="31b1a729-02a3-482e-bec8-6e2ad9cc6e69" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
